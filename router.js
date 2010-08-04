@@ -1,7 +1,7 @@
 steal.plugins("jquery",
               "jquery/class",
               "jquery/controller/history",
-              "steal/openajax")
+              "jquery/lang/openajax")
      .then("sherpa")
      .then(function($) {
 
