@@ -1,3 +1,5 @@
+//var sys = require('sys');
+
 RegExp.escape = function(text) {
   if (!arguments.callee.sRE) {
     var specials = [
@@ -12,7 +14,6 @@ RegExp.escape = function(text) {
 }
 
 Sherpa = {
-  SplitRegex: /\//,
   Router: function(options) {
     this.routes = {};
     this.root = new Sherpa.Node();
@@ -20,11 +21,10 @@ Sherpa = {
   },
   Path: function(route, uri) {
     this.route = route;
-    var regex = /(\/|:[a-zA-Z0-9_]+|(?:\\:|[^:\/]+)*)/;
-    var splitUri = uri.split(regex);
+    var splitUri = this.pathSplit(uri);
 
     this.compiledUri = [];
-    
+
     for (var splitUriIdx = 0; splitUriIdx != splitUri.length; splitUriIdx++) {
       if (splitUri[splitUriIdx].substring(0, 1) == ':') {
         this.compiledUri.push("params['" + splitUri[splitUriIdx].substring(1) + "']");
@@ -32,11 +32,11 @@ Sherpa = {
         this.compiledUri.push("'" + splitUri[splitUriIdx] + "'");
       }
     }
-    
+
     this.compiledUri = this.compiledUri.join('+');
-    
+
     this.groups = [];
-    
+
     for (var splitIndex = 0; splitIndex < splitUri.length; splitIndex++) {
       var part = splitUri[splitIndex];
       if (part == '/') {
@@ -53,10 +53,10 @@ Sherpa = {
     this.variableNames = [];
     var paths = [""];
     var chars = uri.split('');
-    
+
     var startIndex = 0;
     var endIndex = 1;
-    
+
     for (var charIndex in chars) {
       var c = chars[charIndex];
       if (c == '(') {
@@ -76,7 +76,7 @@ Sherpa = {
         }
       }
     }
-    
+
     this.partial = false;
     this.paths = [];
     for (var pathsIdx = 0; pathsIdx != paths.length; pathsIdx++) {
@@ -170,7 +170,7 @@ Sherpa.Node.prototype = {
                 matchedParams.push(match[matchIdx]);
               }
             }
-            
+
             var newParams = params.concat(matchedParams);
             matchedIndex = match.shift().length;
             var resplitParts = wholePath.substring(matchedIndex).split('/');
@@ -179,7 +179,7 @@ Sherpa.Node.prototype = {
             if (potentialMatch) return potentialMatch;
           }
         }
-      } 
+      }
       if (this.lookup[parts[0]]) {
         var potentialMatch = this.lookup[parts[0]].find(parts.slice(1, parts.length), request, params);
         if (potentialMatch) return potentialMatch;
@@ -239,7 +239,7 @@ Sherpa.Node.prototype = {
         if (currentNodes.length == 1 && currentNodes[0] === this) {
           currentNodes = [this.addRequestNode()];
         }
-        
+
         for (var currentNodeIndex = 0; currentNodeIndex != currentNodes.length; currentNodeIndex++) {
           var currentNode = currentNodes[currentNodeIndex];
           if (!currentNode.requestMethod) {
@@ -248,7 +248,7 @@ Sherpa.Node.prototype = {
 
           var masterPosition = requestMethods.indexOf(method);
           var currentPosition = requestMethods.indexOf(currentNode.requestMethod);
-          
+
           if (masterPosition == currentPosition) {
             if (requestConditions[method].compile) {
               currentNodes[currentNodeIndex] = currentNodes[currentNodeIndex].addLinear(requestConditions[method], 0);
@@ -357,7 +357,7 @@ Sherpa.Route.prototype = {
         if (path) break;
       }
     }
-    
+
     if (path) {
       path = encodeURI(path);
       var query = '';
@@ -372,6 +372,41 @@ Sherpa.Route.prototype = {
 };
 
 Sherpa.Path.prototype = {
+  pathSplit: function(path) {
+    var splitParts = [];
+    var parts = path.split('/');
+    if (parts[0] == '') parts.shift();
+
+    for(var i = 0; i != parts.length; i++) {
+      splitParts.push("/");
+      splitParts.push("");
+      partChars = parts[i].split('');
+
+      var inVariable = false;
+
+      for (var j = 0; j != partChars.length; j++) {
+        if (inVariable) {
+          var code = partChars[j].charCodeAt(0);
+          if ((code >= 48 && code <= 57) || (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || code == 95) {
+            splitParts[splitParts.length - 1] += partChars[j];
+          } else {
+            inVariable = false;
+            splitParts.push(partChars[j]);
+          }
+        } else if (partChars[j] == ':') {
+          inVariable = true;
+          if (splitParts[splitParts.length - 1] == '') {
+            splitParts[splitParts.length - 1] += ":";
+          } else {
+            splitParts.push(":");
+          }
+        } else {
+          splitParts[splitParts.length - 1] += partChars[j];
+        }
+      }
+    }
+    return splitParts;
+  },
   generate: function(params) {
     for(var varIdx = 0; varIdx != this.variableNames.length; varIdx++) {
       if (!params[this.variableNames[varIdx]]) return undefined;
