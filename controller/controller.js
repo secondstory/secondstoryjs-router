@@ -1,11 +1,11 @@
 steal.plugins("jquery",
               "jquery/class",
               "jquery/controller/history",
-              "jquery/lang/openajax")
-     .then("sherpa")
+              "jquery/lang/openajax",
+              "ss/router/sherpa")
      .then(function($) {
 
-  $.Class.extend("SS.Router",
+  $.Class.extend("SS.Router.Controller",
   {
     currentParams: {},
     URLPrefix:     null,

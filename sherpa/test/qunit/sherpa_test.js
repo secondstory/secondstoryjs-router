@@ -1,5 +1,6 @@
 module("Sherpa Router");
 
+var Router = new Sherpa.Router();
 Router.add("/path").to("basic");
 Router.add("/withvariable/:something").to("with_var");
 Router.add("/withmatch/:something", { matchesWith: { something: /\d+/ } }).to("with_match");
