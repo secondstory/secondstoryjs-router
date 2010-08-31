@@ -17,7 +17,7 @@ steal.plugins("jquery/controller",
     var callbacks = RouteToCallback[foundRoute.destination];
     if (callbacks) {
       for (var i = 0; i < callbacks.length; i++) {
-        callbacks[i]();
+        callbacks[i](foundRoute.destination, foundRoute.params);
       }
     }
   });
