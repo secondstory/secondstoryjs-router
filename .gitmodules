@@ -1,0 +1,3 @@
+[submodule "sherpa/repo"]
+	path = sherpa/repo
+	url = git://github.com/joshbuddy/sherpa.git
