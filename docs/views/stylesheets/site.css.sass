@@ -1,0 +1,39 @@
+@import "compass"
+@import "blueprint"
+
+$blueprint-font-family: Georgia, Palatino, "Palatino Linotype", Times, "Times New Roman", serif
+$blueprint-font-size: 14px
+
+$font-color: #ABB1A4
+$header-color: white
+$link-color: #FFB700
+$link-hover-color: #ff5d01
+$link-active-color: $link-color
+$link-visited-color: $link-color
+$link-focus-color: $link-color
+
++global-reset
++blueprint-typography
+
+body
+  background: black url("http://secondstory.com/srv/image_buckets/website-backgrounds/random_uri.xhtml") no-repeat fixed
+  background-size: 100% 100%
+
+#frame
+  +container
+  background: rgba(0, 0, 0, 0.9) image-url("croc.png") no-repeat 330px 0
+  h1
+    +prepend(2)
+    margin-top: 36px
+    a
+      display: block
+      +replace-text-with-dimensions("logo.png", 0, 0)
+      height: 23px
+      &:hover
+        background-position: 0 -23px
+  #content
+    +prepend(3)
+    +append(3)
+
+pre
+  padding: 30px

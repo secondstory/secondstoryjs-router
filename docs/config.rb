@@ -1,3 +1,5 @@
+activate :relative_assets
+
 gem 'ultraviolet'
 require 'uv'   
 
