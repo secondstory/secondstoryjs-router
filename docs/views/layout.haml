@@ -1,0 +1,65 @@
+!!!5
+%html
+  %head
+    %title SecondStoryJS: Router
+    = stylesheet_link_tag "twilight"
+    %style(type="text/css")
+      :sass
+        @import "compass"
+        @import "blueprint"
+        
+        $blueprint-font-family: Georgia, Palatino, "Palatino Linotype", Times, "Times New Roman", serif
+        $blueprint-font-size: 14px
+        
+        $font-color: #ABB1A4
+        $header-color: white
+        $link-color: #FFB700
+        $link-hover-color: #ff5d01
+        $link-active-color: $link-color
+        $link-visited-color: $link-color
+        $link-focus-color: $link-color
+        
+        +global-reset
+        +blueprint-typography
+        
+        body
+          background: black url("http://secondstory.com/srv/image_buckets/website-backgrounds/random_uri.xhtml") no-repeat fixed
+          background-size: 100% 100%
+        
+        #frame
+          +container
+          background: rgba(0, 0, 0, 0.9) image-url("croc.png") no-repeat 330px 0
+          h1
+            +prepend(2)
+            margin-top: 36px
+            a
+              display: block
+              +replace-text-with-dimensions("logo.png", 0, 0)
+              height: 23px
+              &:hover
+                background-position: 0 -23px
+          #content
+            +prepend(3)
+            +append(3)
+        
+        pre
+          padding: 30px
+  %body
+    :plain
+      <a href="http://github.com/secondstory/secondstoryjs-router"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+      
+    #frame
+      %h1= link_to "Second Story", "http://secondstory.com"
+      #content
+        = yield
+        
+    :javascript
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-16557054-5']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();

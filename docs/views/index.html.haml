@@ -1,0 +1,113 @@
+:markdown
+  [SammyJS]: http://github.com/quirkey/sammy
+  [Sherpa]: http://github.com/joshbuddy/sherpa
+  [Sherpa Documentation]: http://github.com/joshbuddy/sherpa#readme
+  [MIT License]: http://github.com/secondstory/secondstoryjs-router/blob/master/LICENSE
+
+  ## SecondStoryJS: Router
+
+  SecondStoryJS is our front-end development framework built as a collection of plugins for JavascriptMVC3. This plugin, the Router, addresses the issue of responding to URL changes which trigger actions and events, but do not reload the page. This interaction is widespread on AJAX and Flash websites to provide unique urls which can be copied and shared while retaining the "all in one page" features that allow modern webapps to be fast, responsive and more interactive than their static predecessors.
+
+  ### Features
+  
+  * At the lowest level, the Router provides access to Sherpa, which is Joshua Hull's pure javascript router which can run either in-browser or on the NodeJS platform. Directly interacting and manipulating this library is known as "Basic Routing" and is documented below.
+  
+  * The middle level of integration is a JavascriptMVC3 Controller instance that monitors URL changes and emits OpenAjax events which your code can respond to.
+  
+  * The highest level of integration is a JavascriptMVC Controller "subscriber" which allows controllers to bind functions to URLs (and URL changes) much like Aaron Quint's popular [SammyJS] framework.
+  
+  #### Basic Routing
+  
+  Because Basic Routing is simply a wrapper around Sherpa, all the functionality described in the [Sherpa Documentation] applies here.
+  
+  There are two actions which can be taken.
+  
+  First, you can create the possible routes which can be matched against. The syntax is as follows (and better documented on the Sherpa site):
+
+      :::javascript
+      Router.add('/test/:variable').to('testing');
+      Router.recognize('/test/iloveyou') ->
+        {
+          "destination": "testing",
+          "params": {
+            "variable": "iloveyou"
+          }
+        }
+  
+  As you can see, the first command creates a route with a slot for a variable and sets a name for this particular route. The second command tries to match a route against the defined routes and returns the matching description.
+
+  A full example of the code in-use in JavascriptMVC3 would look like:
+  
+      :::javascript
+      steal.plugin("ss/router/sherpa")
+           .then(function($) {
+
+        var Router = new Sherpa.Router();
+        Router.add("/articles/:article_name").to("project_article");
+
+        var key        = window.location.pathname,
+            foundRoute = Router.recognize(key);
+
+        if (foundRoute && $(document)[foundRoute.destination]) {
+          $(document)[foundRoute.destination](foundRoute.params);
+        }
+      });
+  
+  The above code loads the JavascriptMVC3 plugin we provide, initalizes the router, adds a route and then matches the current URL against the route. If the route matches successfully, a jquery plugin is called on the document element with the parameters found in the match.
+
+  #### Route Change Events &amp; Router Controller
+  
+  The Route Controller simplifies the interaction by using OpenAjax events to allow multiple subscribers to respond to a single URL change.
+  
+      :::javascript
+      steal.plugins("ss/router/controller")
+           .then(function($) {
+
+        Router.add("/articles/:article_name").to("project_article");
+      });
+
+  When #/articles/my-first-article is accessed, OpenAjax will publish a project_article event with "my-first-article" as the "article_name" parameter.
+
+  #### Route Subscriptions
+
+  The final means of integration is to monitor URL changes in individual JavascriptMVC3 Controllers. This is very similar to the way SammyJS functions.
+  
+      :::javascript
+      steal.plugins("jquery/controller",
+                    "ss/router/subscribe")
+           .then(function($) {
+           
+        $.Controller.extend("MyController", {
+        },
+        {
+          "/homepage route": function() {
+            // Setup homepage javascript
+          },
+          
+          "/about/:user route": function(params) {
+            // Show information about a user
+            // The URL "/about/bob" with call this function
+            // params will contain { :user => "bob" }
+          }
+        });
+        
+      });
+
+  ### Installation
+  
+  The source code is available on GitHub at <a href="http://github.com/secondstory/secondstoryjs-router">http://github.com/secondstory/secondstoryjs-router</a>. Please, fork the project, make your own changes and we'll happily pull bug fixes and new features into the official repository.
+  
+  However, JavascriptMVC3 provides an easier way to download plugins. From your project folder, simply run:
+  
+      :::shell-unix-generic
+      ./steal/js steal/getjs ss/router
+  
+  This will download the full plugin into your working directory.
+
+  ### License
+
+  This code is provided under the [MIT License].
+
+  ### Bugs
+  
+  Please submit any bug reports to the project issue tracker on GitHub at: <a href="http://github.com/secondstory/secondstoryjs-router/issues">http://github.com/secondstory/secondstoryjs-router/issues</a>.
